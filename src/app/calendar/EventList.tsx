@@ -1,11 +1,11 @@
-"use client"
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
-import { useSelector, useDispatch } from 'react-redux';
 
 import { Event as EventType } from './types';
-import { useMoonPhasesEvents } from '../slices/moonphases';
 import { CalenderState, remove, select } from '../slices/calendar';
+import { EventState, fetchMoonPhasesEventsByYear } from '../slices/moonphases';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { useEffect } from 'react';
 
 interface EventProps {
   event: EventType;
@@ -15,8 +15,9 @@ interface EventProps {
 
 export default function EventList() {
 
-  const dispatch = useDispatch();
-  const { filterDate, events } = useSelector<any,CalenderState>((state: any) => state.calendar);
+  const dispatch = useAppDispatch();
+  const { events: moonphases } = useAppSelector<any,EventState>((state: any) => state.moonphases);
+  const { filterDate, events } = useAppSelector<any,CalenderState>((state: any) => state.calendar);
 
   function onDeleteEvent(id: string) {
     dispatch(remove(id));
@@ -26,11 +27,14 @@ export default function EventList() {
     dispatch(select(id));
   }
 
-  // const { data, isLoading } = useMoonPhasesEvents(moment(filterDate).year());
+  const year = moment(filterDate).year();
+  useEffect(() => {
+    dispatch(fetchMoonPhasesEventsByYear(year));
+  }, [year]);
 
-  // const allEvents = !isLoading && data ? [...events, ...data] : events;
+  const allEvents = [...events, ...moonphases];
 
-  const filteredEvents = events?.filter(event => {
+  const filteredEvents = allEvents?.filter(event => {
     // TODO: fix date filter
     // filterDate is complete date so 
     // filterDateMoment.isSame(startDateMoment, 'day') and
@@ -53,7 +57,7 @@ export default function EventList() {
           placeholderText='Filter by date'
           selected={filterDate}
           onChange={(date) => {
-            date && dispatch({ type: 'FILTER_DATE', data: date });
+            date && dispatch(select(date));
           }}
           dateFormat={'MMMM d, yyyy'}
         />

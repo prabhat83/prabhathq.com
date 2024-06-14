@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import CalendarReducer from '../app/slices/calendar'
+import moonphasesReducer from '@/app/slices/moonphases'
 
 export const store = configureStore({
   reducer: {
     calendar: CalendarReducer,
+    moonphases: moonphasesReducer
   },
   devTools: process.env.NODE_ENV !== 'production',
 })

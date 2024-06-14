@@ -32,7 +32,7 @@ const calendarSlice = createSlice({
       state.events[index] = action.payload;
     },
     select: (state, action) => {
-      state.selectedEvent = action.payload;
+      state.filterDate = action.payload;
     }
   },
 });
